@@ -5,6 +5,8 @@ import torchvision.transforms as transforms
 from gaussian_blur import GaussianBlur
 from torchvision import datasets
 
+import random
+
 class DataSetWrapper(object):
     def __init__(self, batch_size, num_workers, valid_size, input_shape):
         self.batch_size = batch_size
@@ -22,13 +24,20 @@ class DataSetWrapper(object):
         return train_loader, valid_loader
 
     def _simclr_transform(self):
-        ### TODO: Complete SimCLR transforms ###
         # I strongly recommand you to use torchvision.transforms to implement data augmentation
         # You can use provided gaussian_blur if you want
 
-        data_transforms: transforms.Compose
-
-        gaussian_blur = GaussianBlur(kernel_size = int(0.1* self.input_shape[0]))
+        data_transforms = transforms.Compose([
+            transforms.RandomResizedCrop(self.input_shape[0]),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomGrayscale(p=1),
+            transforms.ColorJitter(brightness=(0.2, 2),
+                                   contrast=(0.3, 2),
+                                   saturation=(0.2, 2),
+                                   hue=(-0.3, 0.3)),
+            GaussianBlur(kernel_size = int(0.1* self.input_shape[0]))
+        ])
 
         return data_transforms
 
