@@ -33,6 +33,13 @@ def main(args):
     optimizer = torch.optim.Adam(model.parameters(), 1e-3, weight_decay=1e-5)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0, last_epoch=-1)
 
+    # Load previous model
+    model_name = '0-' + str(epochs)
+    if (args.prev_model_dir != ''):
+        checkpoint = torch.load(args.prev_model_dir, map_location=device)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state'])
+        model_name = str(checkpoint['epoch']) + "-" + str(checkpoint['epoch']+epochs)
     '''
     Model-- ResNet18(encoder network) + MLP with one hidden layer(projection head)
     Loss -- NT-Xent Loss
@@ -83,7 +90,7 @@ def main(args):
                 'model_state_dict': model.state_dict(),
                 'optimizer_state': optimizer.state_dict(),
                 'loss': best_loss
-            }, "./best_model.pt")
+            }, "./best_model" + model_name + ".pt")
             print("Model save")
         
 
@@ -141,6 +148,11 @@ if __name__ == '__main__':
     parser.add_argument(
         '--no_save',
         action='store_true'
+    )
+    parser.add_argument(
+        '--prev_model_dir',
+        type=str,
+        default=''
     )
 
     args = parser.parse_args()

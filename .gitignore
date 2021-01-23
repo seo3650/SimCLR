@@ -1,4 +1,5 @@
 /data
 /.vscode
 /__pycache__
-best_model.pt
+best_model*
+nohup.out
