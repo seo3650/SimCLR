@@ -1,5 +1,7 @@
-/data
-/.vscode
-/__pycache__
+data/
+.vscode/
+__pycache__/
 best_model*
 nohup.out
+model/
+main.ipynb
