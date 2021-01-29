@@ -81,7 +81,10 @@ def train_classifier(args, epochs, optimizer, criterion, train_loader, valid_loa
     print("Training start with label dataset")
     train_loss_list, valid_loss_list = [], []
     best_loss = 987654321
+    remain_early_stopping = 10
     for epoch in range(epochs):
+        if remain_early_stopping <= 0:
+            break
         train_total_loss, valid_total_loss = 0.0, 0.0
         
         model.train()
@@ -127,6 +130,9 @@ def train_classifier(args, epochs, optimizer, criterion, train_loader, valid_loa
                 'loss': best_loss
             }, save_name)
             print("Model save")
+            remain_early_stopping = 10
+        else:
+            remain_early_stopping -= 1
 
     print("Training finish")
     return train_loss_list, valid_loss_list
@@ -144,7 +150,7 @@ def test(test_loader, model, device):
             correct_num += idxs.eq(label.to(device)).sum()
             break
     
-    print("Total: " + str(total_num), "Correct: " + str(correct_num), "Accuracy: " + str(correct_num / float(total_num)))
+    print("Total: " + str(total_num), "Correct: " + str(correct_num), "Accuracy: " + str(float(correct_num) / float(total_num)))
 
 def plot_loss_curve(train_loss_list, valid_loss_list, dataset, name = ''):
     # Save training log
